@@ -35,7 +35,7 @@ This template deploys the following services:
 1. **Add Template to Coolify**:
    - Go to your Coolify dashboard
    - Navigate to Templates → Add Template
-   - Use this repository URL: `https://github.com/your-username/opnform-coolify-template`
+   - Use this repository URL: `https://github.com/softhackghana/opnform-coolify-template`
 
 2. **Deploy Application**:
    - Click "Deploy" on the OpnForm template
