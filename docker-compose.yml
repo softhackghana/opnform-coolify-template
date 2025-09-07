@@ -252,7 +252,7 @@ services:
     labels:
       - "coolify.managed=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.opnform-ingress.rule=Host(\`${SERVICE_FQDN_OPNFORM_INGRESS}\`)"
+      - "traefik.http.routers.opnform-ingress.rule=Host(`${SERVICE_FQDN_OPNFORM_INGRESS}`)"
       - "traefik.http.routers.opnform-ingress.tls=true"
       - "traefik.http.routers.opnform-ingress.tls.certresolver=letsencrypt"
       - "traefik.http.services.opnform-ingress.loadbalancer.server.port=80"
