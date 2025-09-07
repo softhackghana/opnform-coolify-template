@@ -1,0 +1,269 @@
+services:
+  opnform-api:
+    image: jhumanj/opnform-api:latest
+    volumes:
+      - opnform_storage:/usr/share/nginx/html/storage:rw
+    environment:
+      APP_ENV: production
+      APP_NAME: "${APP_NAME:-OpnForm}"
+      APP_KEY: "${APP_KEY}"
+      APP_URL: "${SERVICE_FQDN_OPNFORM_INGRESS}"
+      FRONT_URL: "${SERVICE_FQDN_OPNFORM_INGRESS}"
+      
+      # Database settings
+      DB_HOST: opnform-db
+      DB_DATABASE: "${DB_DATABASE:-opnform}"
+      DB_USERNAME: "${DB_USERNAME:-opnform}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_CONNECTION: "${DB_CONNECTION:-pgsql}"
+      
+      # Redis settings
+      REDIS_HOST: opnform-redis
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_PORT: 6379
+      
+      # Self-hosted configuration
+      SELF_HOSTED: "true"
+      
+      # JWT Configuration
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_TTL: 10080
+      JWT_REMEMBER_TTL: 43200
+      
+      # Mail configuration
+      MAIL_MAILER: "${MAIL_MAILER:-smtp}"
+      MAIL_HOST: "${MAIL_HOST}"
+      MAIL_PORT: "${MAIL_PORT:-587}"
+      MAIL_USERNAME: "${MAIL_USERNAME}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD}"
+      MAIL_ENCRYPTION: "${MAIL_ENCRYPTION:-tls}"
+      MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS}"
+      MAIL_FROM_NAME: "${MAIL_FROM_NAME:-OpnForm}"
+      
+      # Storage configuration
+      FILESYSTEM_DRIVER: "${FILESYSTEM_DRIVER:-local}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+      AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION:-us-east-1}"
+      AWS_BUCKET: "${AWS_BUCKET:-}"
+      
+      # Optional integrations
+      OPEN_AI_API_KEY: "${OPEN_AI_API_KEY:-}"
+      H_CAPTCHA_SITE_KEY: "${H_CAPTCHA_SITE_KEY:-}"
+      H_CAPTCHA_SECRET_KEY: "${H_CAPTCHA_SECRET_KEY:-}"
+      RE_CAPTCHA_SITE_KEY: "${RE_CAPTCHA_SITE_KEY:-}"
+      RE_CAPTCHA_SECRET_KEY: "${RE_CAPTCHA_SECRET_KEY:-}"
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
+      GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
+      
+      # PHP Configuration
+      PHP_MEMORY_LIMIT: "1G"
+      PHP_MAX_EXECUTION_TIME: "600"
+      PHP_UPLOAD_MAX_FILESIZE: "64M"
+      PHP_POST_MAX_SIZE: "64M"
+      
+      # Cache and Queue settings
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      SESSION_LIFETIME: 120
+    depends_on:
+      opnform-db:
+        condition: service_healthy
+      opnform-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "php /usr/share/nginx/html/artisan about || exit 1"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+
+  opnform-api-worker:
+    image: jhumanj/opnform-api:latest
+    command: ["php", "artisan", "queue:work"]
+    volumes:
+      - opnform_storage:/usr/share/nginx/html/storage:rw
+    environment:
+      APP_ENV: production
+      APP_NAME: "${APP_NAME:-OpnForm}"
+      APP_KEY: "${APP_KEY}"
+      APP_URL: "${SERVICE_FQDN_OPNFORM_INGRESS}"
+      FRONT_URL: "${SERVICE_FQDN_OPNFORM_INGRESS}"
+      
+      # Database settings
+      DB_HOST: opnform-db
+      DB_DATABASE: "${DB_DATABASE:-opnform}"
+      DB_USERNAME: "${DB_USERNAME:-opnform}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_CONNECTION: "${DB_CONNECTION:-pgsql}"
+      
+      # Redis settings
+      REDIS_HOST: opnform-redis
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_PORT: 6379
+      
+      # Self-hosted configuration
+      SELF_HOSTED: "true"
+      
+      # JWT Configuration
+      JWT_SECRET: "${JWT_SECRET}"
+      
+      # Storage configuration
+      FILESYSTEM_DRIVER: "${FILESYSTEM_DRIVER:-local}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+      AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION:-us-east-1}"
+      AWS_BUCKET: "${AWS_BUCKET:-}"
+      
+      # Cache and Queue settings
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+    depends_on:
+      opnform-db:
+        condition: service_healthy
+      opnform-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'php artisan queue:work' > /dev/null || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  opnform-api-scheduler:
+    image: jhumanj/opnform-api:latest
+    command: ["php", "artisan", "schedule:work"]
+    volumes:
+      - opnform_storage:/usr/share/nginx/html/storage:rw
+    environment:
+      APP_ENV: production
+      APP_NAME: "${APP_NAME:-OpnForm}"
+      APP_KEY: "${APP_KEY}"
+      APP_URL: "${SERVICE_FQDN_OPNFORM_INGRESS}"
+      FRONT_URL: "${SERVICE_FQDN_OPNFORM_INGRESS}"
+      
+      # Database settings
+      DB_HOST: opnform-db
+      DB_DATABASE: "${DB_DATABASE:-opnform}"
+      DB_USERNAME: "${DB_USERNAME:-opnform}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_CONNECTION: "${DB_CONNECTION:-pgsql}"
+      
+      # Redis settings
+      REDIS_HOST: opnform-redis
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_PORT: 6379
+      
+      # Self-hosted configuration
+      SELF_HOSTED: "true"
+      
+      # JWT Configuration
+      JWT_SECRET: "${JWT_SECRET}"
+      
+      # Storage configuration
+      FILESYSTEM_DRIVER: "${FILESYSTEM_DRIVER:-local}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+      AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION:-us-east-1}"
+      AWS_BUCKET: "${AWS_BUCKET:-}"
+      
+      # Cache and Queue settings
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+    depends_on:
+      opnform-db:
+        condition: service_healthy
+      opnform-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "php /usr/share/nginx/html/artisan app:scheduler-status --mode=check --max-minutes=3 || exit 1"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 70s
+
+  opnform-ui:
+    image: jhumanj/opnform-client:latest
+    environment:
+      NUXT_PUBLIC_APP_URL: "${SERVICE_FQDN_OPNFORM_INGRESS}"
+      NUXT_PUBLIC_API_BASE: "${SERVICE_FQDN_OPNFORM_INGRESS}"
+      NUXT_PRIVATE_API_BASE: "http://opnform-ingress"
+      NUXT_API_SECRET: "${NUXT_API_SECRET:-secret}"
+      NUXT_PUBLIC_ENV: production
+      NODE_ENV: production
+      
+      # Optional analytics
+      NUXT_PUBLIC_AMPLITUDE_CODE: "${NUXT_PUBLIC_AMPLITUDE_CODE:-}"
+      NUXT_PUBLIC_CRISP_WEBSITE_ID: "${NUXT_PUBLIC_CRISP_WEBSITE_ID:-}"
+      NUXT_PUBLIC_GOOGLE_ANALYTICS_CODE: "${NUXT_PUBLIC_GOOGLE_ANALYTICS_CODE:-}"
+      
+      # Captcha keys
+      NUXT_PUBLIC_H_CAPTCHA_SITE_KEY: "${H_CAPTCHA_SITE_KEY:-}"
+      NUXT_PUBLIC_RE_CAPTCHA_SITE_KEY: "${RE_CAPTCHA_SITE_KEY:-}"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000/login || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  opnform-redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass "${REDIS_PASSWORD}"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"${REDIS_PASSWORD}\" ping | grep PONG"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  opnform-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: "${DB_DATABASE:-opnform}"
+      POSTGRES_USER: "${DB_USERNAME:-opnform}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-opnform}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  opnform-ingress:
+    image: nginx:1-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template
+      - opnform_storage:/usr/share/nginx/html/storage:ro
+    environment:
+      NGINX_MAX_BODY_SIZE: 64m
+    depends_on:
+      opnform-api:
+        condition: service_started
+      opnform-ui:
+        condition: service_started
+    labels:
+      - "coolify.managed=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.opnform-ingress.rule=Host(\`${SERVICE_FQDN_OPNFORM_INGRESS}\`)"
+      - "traefik.http.routers.opnform-ingress.tls=true"
+      - "traefik.http.routers.opnform-ingress.tls.certresolver=letsencrypt"
+      - "traefik.http.services.opnform-ingress.loadbalancer.server.port=80"
+    healthcheck:
+      test: ["CMD-SHELL", "nginx -t && wget --spider -q http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres-data:
+  opnform_storage:
+  redis-data:

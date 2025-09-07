@@ -1,0 +1,271 @@
+{
+  "name": "OpnForm",
+  "description": "Beautiful Open-Source Form Builder - A self-hosted alternative to Typeform, Google Forms, and other form builders.",
+  "version": "1.0.0",
+  "author": "OpnForm Community",
+  "repository": "https://github.com/JhumanJ/OpnForm",
+  "documentation": "https://github.com/JhumanJ/OpnForm/blob/main/README.md",
+  "logo": "https://raw.githubusercontent.com/JhumanJ/OpnForm/main/client/public/img/logo.svg",
+  "category": "Forms",
+  "tags": ["forms", "surveys", "feedback", "data-collection", "no-code"],
+  "architecture": ["amd64", "arm64"],
+  "minimum_coolify_version": "4.0.0",
+  "services": {
+    "opnform-ingress": {
+      "name": "OpnForm Web Interface",
+      "image": "nginx:1-alpine",
+      "is_main": true,
+      "description": "Main web interface for OpnForm accessible via browser"
+    },
+    "opnform-api": {
+      "name": "OpnForm API",
+      "image": "jhumanj/opnform-api:latest",
+      "description": "Backend API service handling form logic and data processing"
+    },
+    "opnform-api-worker": {
+      "name": "OpnForm Queue Worker",
+      "image": "jhumanj/opnform-api:latest",
+      "description": "Background worker for processing queued jobs like email notifications"
+    },
+    "opnform-api-scheduler": {
+      "name": "OpnForm Scheduler",
+      "image": "jhumanj/opnform-api:latest",
+      "description": "Handles scheduled tasks and maintenance jobs"
+    },
+    "opnform-ui": {
+      "name": "OpnForm Frontend",
+      "image": "jhumanj/opnform-client:latest",
+      "description": "Frontend user interface built with Nuxt.js"
+    },
+    "opnform-db": {
+      "name": "PostgreSQL Database",
+      "image": "postgres:16-alpine",
+      "description": "Primary database for storing forms, responses, and user data"
+    },
+    "opnform-redis": {
+      "name": "Redis Cache",
+      "image": "redis:7-alpine",
+      "description": "Cache and session storage for improved performance"
+    }
+  },
+  "volumes": {
+    "postgres-data": {
+      "description": "PostgreSQL database files"
+    },
+    "opnform_storage": {
+      "description": "File uploads and form assets storage"
+    },
+    "redis-data": {
+      "description": "Redis persistence data"
+    }
+  },
+  "environment_variables": {
+    "required": [
+      {
+        "name": "APP_KEY",
+        "description": "Laravel application encryption key (base64:xxxxx format)",
+        "type": "password",
+        "generate": "base64:$(openssl rand -base64 32)"
+      },
+      {
+        "name": "JWT_SECRET",
+        "description": "JWT token signing secret",
+        "type": "password",
+        "generate": "$(openssl rand -hex 32)"
+      },
+      {
+        "name": "DB_PASSWORD",
+        "description": "PostgreSQL database password",
+        "type": "password",
+        "generate": "$(openssl rand -hex 16)"
+      },
+      {
+        "name": "REDIS_PASSWORD",
+        "description": "Redis authentication password",
+        "type": "password",
+        "generate": "$(openssl rand -hex 16)"
+      }
+    ],
+    "optional": [
+      {
+        "name": "APP_NAME",
+        "description": "Application name displayed in the interface",
+        "default": "OpnForm",
+        "type": "text"
+      },
+      {
+        "name": "DB_DATABASE",
+        "description": "PostgreSQL database name",
+        "default": "opnform",
+        "type": "text"
+      },
+      {
+        "name": "DB_USERNAME",
+        "description": "PostgreSQL database username",
+        "default": "opnform",
+        "type": "text"
+      },
+      {
+        "name": "DB_CONNECTION",
+        "description": "Database connection type",
+        "default": "pgsql",
+        "type": "select",
+        "options": ["pgsql", "mysql"]
+      },
+      {
+        "name": "MAIL_MAILER",
+        "description": "Email service provider",
+        "default": "smtp",
+        "type": "select",
+        "options": ["smtp", "mailgun", "ses", "postmark", "log"]
+      },
+      {
+        "name": "MAIL_HOST",
+        "description": "SMTP server hostname",
+        "type": "text",
+        "condition": "MAIL_MAILER=smtp"
+      },
+      {
+        "name": "MAIL_PORT",
+        "description": "SMTP server port",
+        "default": "587",
+        "type": "number",
+        "condition": "MAIL_MAILER=smtp"
+      },
+      {
+        "name": "MAIL_USERNAME",
+        "description": "SMTP username",
+        "type": "text",
+        "condition": "MAIL_MAILER=smtp"
+      },
+      {
+        "name": "MAIL_PASSWORD",
+        "description": "SMTP password",
+        "type": "password",
+        "condition": "MAIL_MAILER=smtp"
+      },
+      {
+        "name": "MAIL_ENCRYPTION",
+        "description": "SMTP encryption method",
+        "default": "tls",
+        "type": "select",
+        "options": ["tls", "ssl", "none"],
+        "condition": "MAIL_MAILER=smtp"
+      },
+      {
+        "name": "MAIL_FROM_ADDRESS",
+        "description": "Default sender email address",
+        "type": "email"
+      },
+      {
+        "name": "MAIL_FROM_NAME",
+        "description": "Default sender name",
+        "default": "OpnForm",
+        "type": "text"
+      },
+      {
+        "name": "FILESYSTEM_DRIVER",
+        "description": "File storage driver",
+        "default": "local",
+        "type": "select",
+        "options": ["local", "s3"]
+      },
+      {
+        "name": "AWS_ACCESS_KEY_ID",
+        "description": "AWS access key for S3 storage",
+        "type": "text",
+        "condition": "FILESYSTEM_DRIVER=s3"
+      },
+      {
+        "name": "AWS_SECRET_ACCESS_KEY",
+        "description": "AWS secret key for S3 storage",
+        "type": "password",
+        "condition": "FILESYSTEM_DRIVER=s3"
+      },
+      {
+        "name": "AWS_DEFAULT_REGION",
+        "description": "AWS region for S3 storage",
+        "default": "us-east-1",
+        "type": "text",
+        "condition": "FILESYSTEM_DRIVER=s3"
+      },
+      {
+        "name": "AWS_BUCKET",
+        "description": "S3 bucket name",
+        "type": "text",
+        "condition": "FILESYSTEM_DRIVER=s3"
+      },
+      {
+        "name": "OPEN_AI_API_KEY",
+        "description": "OpenAI API key for AI features",
+        "type": "password"
+      },
+      {
+        "name": "H_CAPTCHA_SITE_KEY",
+        "description": "hCaptcha site key for spam protection",
+        "type": "text"
+      },
+      {
+        "name": "H_CAPTCHA_SECRET_KEY",
+        "description": "hCaptcha secret key",
+        "type": "password"
+      },
+      {
+        "name": "RE_CAPTCHA_SITE_KEY",
+        "description": "reCaptcha site key for spam protection",
+        "type": "text"
+      },
+      {
+        "name": "RE_CAPTCHA_SECRET_KEY",
+        "description": "reCaptcha secret key",
+        "type": "password"
+      },
+      {
+        "name": "GOOGLE_CLIENT_ID",
+        "description": "Google OAuth client ID for authentication",
+        "type": "text"
+      },
+      {
+        "name": "GOOGLE_CLIENT_SECRET",
+        "description": "Google OAuth client secret",
+        "type": "password"
+      },
+      {
+        "name": "NUXT_API_SECRET",
+        "description": "API secret for frontend-backend communication",
+        "default": "secret",
+        "type": "password"
+      },
+      {
+        "name": "NUXT_PUBLIC_AMPLITUDE_CODE",
+        "description": "Amplitude analytics code",
+        "type": "text"
+      },
+      {
+        "name": "NUXT_PUBLIC_CRISP_WEBSITE_ID",
+        "description": "Crisp chat website ID",
+        "type": "text"
+      },
+      {
+        "name": "NUXT_PUBLIC_GOOGLE_ANALYTICS_CODE",
+        "description": "Google Analytics tracking code",
+        "type": "text"
+      }
+    ]
+  },
+  "ports": {
+    "opnform-ingress": {
+      "internal": 80,
+      "description": "Main web interface port"
+    }
+  },
+  "healthchecks": {
+    "opnform-ingress": {
+      "test": "nginx -t && wget --spider -q http://localhost/ || exit 1",
+      "interval": 30,
+      "timeout": 5,
+      "retries": 3,
+      "start_period": 10
+    }
+  }
+}
