@@ -72,6 +72,8 @@ services:
         condition: service_healthy
       opnform-redis:
         condition: service_healthy
+    labels:
+      - coolify.managed=true
     healthcheck:
       test: ["CMD-SHELL", "php /usr/share/nginx/html/artisan about || exit 1"]
       interval: 30s
@@ -125,6 +127,8 @@ services:
         condition: service_healthy
       opnform-redis:
         condition: service_healthy
+    labels:
+      - coolify.managed=true
     healthcheck:
       test: ["CMD-SHELL", "pgrep -f 'php artisan queue:work' > /dev/null || exit 1"]
       interval: 60s
@@ -178,6 +182,8 @@ services:
         condition: service_healthy
       opnform-redis:
         condition: service_healthy
+    labels:
+      - coolify.managed=true
     healthcheck:
       test: ["CMD-SHELL", "php /usr/share/nginx/html/artisan app:scheduler-status --mode=check --max-minutes=3 || exit 1"]
       interval: 60s
@@ -203,6 +209,8 @@ services:
       # Captcha keys
       NUXT_PUBLIC_H_CAPTCHA_SITE_KEY: "${H_CAPTCHA_SITE_KEY:-}"
       NUXT_PUBLIC_RE_CAPTCHA_SITE_KEY: "${RE_CAPTCHA_SITE_KEY:-}"
+    labels:
+      - coolify.managed=true
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:3000/login || exit 1"]
       interval: 30s
@@ -215,6 +223,8 @@ services:
     command: redis-server --requirepass "${REDIS_PASSWORD}"
     volumes:
       - redis-data:/data
+    labels:
+      - coolify.managed=true
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -a \"${REDIS_PASSWORD}\" ping | grep PONG"]
       interval: 30s
@@ -230,6 +240,8 @@ services:
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    labels:
+      - coolify.managed=true
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-opnform}"]
       interval: 30s
@@ -239,6 +251,8 @@ services:
 
   opnform-ingress:
     image: nginx:1-alpine
+    ports:
+      - "81:80"
     volumes:
       - ./nginx.conf:/etc/nginx/templates/default.conf.template
       - opnform_storage:/usr/share/nginx/html/storage:ro
@@ -249,6 +263,13 @@ services:
         condition: service_started
       opnform-ui:
         condition: service_started
+    labels:
+      - coolify.managed=true
+      - traefik.enable=true
+      - traefik.http.routers.opnform-ingress.rule=Host(`${SERVICE_FQDN_OPNFORM_INGRESS}`)
+      - traefik.http.routers.opnform-ingress.entrypoints=websecure
+      - traefik.http.routers.opnform-ingress.tls.certresolver=letsencrypt
+      - traefik.http.services.opnform-ingress.loadbalancer.server.port=80
     healthcheck:
       test: ["CMD-SHELL", "nginx -t && wget --spider -q http://localhost/ || exit 1"]
       interval: 30s
