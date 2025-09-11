@@ -1,169 +1,132 @@
 # OpnForm Coolify Template
 
-A Beautiful Open-Source Form Builder - A self-hosted alternative to Typeform, Google Forms, and other form builders.
+This is a Coolify service template for [OpnForm](https://opnform.com), a beautiful open source form builder with AI-powered features.
 
 ## Overview
 
-OpnForm is a powerful, self-hosted form builder that allows you to create beautiful forms, surveys, and collect responses with ease. This Coolify template makes it easy to deploy OpnForm on your own infrastructure with just a few clicks.
+OpnForm is a self-hosted alternative to Typeform and Google Forms that allows you to create stunning forms with advanced features like:
 
-## Features
-
-- ✨ **Beautiful Form Builder**: Drag-and-drop interface for creating stunning forms
-- 📊 **Advanced Analytics**: Track form performance and response analytics  
-- 🔒 **Self-Hosted**: Complete control over your data and privacy
-- 📧 **Email Notifications**: Automated email responses and notifications
-- 🎨 **Customizable Themes**: Brand your forms with custom styling
-- 📱 **Mobile Responsive**: Forms work perfectly on all devices
-- 🔗 **Integrations**: Connect with popular services via webhooks
-- 🤖 **AI Features**: Generate forms with OpenAI integration (optional)
-- 🛡️ **Spam Protection**: Built-in reCAPTCHA and hCAPTCHA support
+- 🎨 Beautiful, customizable form designs
+- 🤖 AI-powered form generation
+- 📊 Advanced analytics and insights
+- 🔗 Powerful integrations (Slack, Discord, Webhooks, etc.)
+- 📱 Mobile-responsive forms
+- 🔒 Built-in spam protection
+- 💾 Multiple storage options (local, S3)
+- 📧 Email notifications
 
 ## Architecture
 
-This template deploys the following services:
+This template deploys OpnForm with the following services:
 
-- **OpnForm API**: Backend Laravel application handling form logic
-- **OpnForm UI**: Frontend Nuxt.js application for the user interface  
-- **Queue Worker**: Background job processing for emails and tasks
-- **Scheduler**: Handles scheduled tasks and maintenance
-- **PostgreSQL**: Primary database for storing forms and responses
-- **Redis**: Cache and session storage for performance
-- **Nginx**: Reverse proxy and static file serving
-
-## Quick Deploy
-
-1. **Add Template to Coolify**:
-   - Go to your Coolify dashboard
-   - Navigate to Templates → Add Template
-   - Use this repository URL: `https://github.com/softhackghana/opnform-coolify-template`
-
-2. **Deploy Application**:
-   - Click "Deploy" on the OpnForm template
-   - Configure the required environment variables (see below)
-   - Wait for deployment to complete
-
-3. **Initial Setup**:
-   - Access your OpnForm instance via the provided URL
-   - Complete the initial setup wizard
-   - Create your admin account
+- **API**: Laravel-based backend API
+- **Worker**: Queue worker for background tasks
+- **Scheduler**: Laravel scheduler for cron jobs
+- **UI**: Nuxt.js frontend application
+- **Database**: PostgreSQL 16
+- **Redis**: For caching and queues
+- **Ingress**: Nginx reverse proxy
 
 ## Required Environment Variables
 
-The following environment variables are **required** and will be auto-generated if not provided:
+### Core Settings
+- `APP_URL`: Full URL where OpnForm will be accessible
+- `FRONT_URL`: Frontend URL (usually same as APP_URL)
+- `APP_KEY`: Laravel application key (32 character random string)
+- `JWT_SECRET`: JWT secret for authentication (64 character random string)
+- `FRONT_API_SECRET`: Frontend API secret for secure communication (64 character random string)
+- `DB_PASSWORD`: PostgreSQL database password
+- `MAIL_FROM_ADDRESS`: Email address for outgoing emails
 
-### Core Configuration
-- `APP_KEY`: Laravel application encryption key (auto-generated)
-- `JWT_SECRET`: JWT token signing secret (auto-generated) 
-- `DB_PASSWORD`: PostgreSQL database password (auto-generated)
-- `REDIS_PASSWORD`: Redis authentication password (auto-generated)
+### Generate Required Keys
 
-## Optional Environment Variables
+To generate the required keys, you can use:
 
-### Database Settings
-- `DB_DATABASE`: Database name (default: `opnform`)
-- `DB_USERNAME`: Database username (default: `opnform`)
-- `DB_CONNECTION`: Database type (default: `pgsql`)
+**APP_KEY**: Generate a 32-character base64 random string using:
+```bash
+openssl rand -base64 32
+```
 
-### Email Configuration
-- `MAIL_MAILER`: Email service (`smtp`, `mailgun`, `ses`, `postmark`, `log`)
+**JWT_SECRET**: Generate a 64-character random string using:
+```bash
+openssl rand -hex 32
+```
+
+**FRONT_API_SECRET**: Generate a 64-character random string using:
+```bash
+openssl rand -hex 32
+```
+
+## Optional Configuration
+
+### Email Settings
+- `MAIL_MAILER`: Mail driver (smtp, sendmail, etc.)
 - `MAIL_HOST`: SMTP server hostname
-- `MAIL_PORT`: SMTP server port (default: `587`)
+- `MAIL_PORT`: SMTP server port (default: 587)
 - `MAIL_USERNAME`: SMTP username
 - `MAIL_PASSWORD`: SMTP password
-- `MAIL_ENCRYPTION`: Encryption method (`tls`, `ssl`, `none`)
-- `MAIL_FROM_ADDRESS`: Default sender email
-- `MAIL_FROM_NAME`: Default sender name
+- `MAIL_ENCRYPTION`: Encryption method (tls/ssl)
 
 ### File Storage
-- `FILESYSTEM_DRIVER`: Storage driver (`local` or `s3`)
-- `AWS_ACCESS_KEY_ID`: AWS access key (for S3 storage)
-- `AWS_SECRET_ACCESS_KEY`: AWS secret key (for S3 storage)
-- `AWS_DEFAULT_REGION`: AWS region (default: `us-east-1`)
-- `AWS_BUCKET`: S3 bucket name
+- `FILESYSTEM_DRIVER`: Storage driver (local or s3)
+- `AWS_ACCESS_KEY_ID`: AWS access key (for S3)
+- `AWS_SECRET_ACCESS_KEY`: AWS secret key (for S3)
+- `AWS_BUCKET`: S3 bucket name (for S3)
 
-### Integrations
-- `OPEN_AI_API_KEY`: OpenAI API key for AI features
+### AI Features
+- `OPEN_AI_API_KEY`: OpenAI API key for AI form generation
+
+### Captcha Protection
 - `H_CAPTCHA_SITE_KEY`: hCaptcha site key
 - `H_CAPTCHA_SECRET_KEY`: hCaptcha secret key
-- `RE_CAPTCHA_SITE_KEY`: reCaptcha site key  
-- `RE_CAPTCHA_SECRET_KEY`: reCaptcha secret key
-- `GOOGLE_CLIENT_ID`: Google OAuth client ID
-- `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
 
 ### Analytics (Optional)
-- `NUXT_PUBLIC_AMPLITUDE_CODE`: Amplitude analytics code
-- `NUXT_PUBLIC_CRISP_WEBSITE_ID`: Crisp chat widget ID
-- `NUXT_PUBLIC_GOOGLE_ANALYTICS_CODE`: Google Analytics tracking code
+- `AMPLITUDE_CODE`: Amplitude tracking code
+- `CRISP_WEBSITE_ID`: Crisp chat widget ID
+- `GOOGLE_ANALYTICS_CODE`: Google Analytics tracking code
 
-## Post-Installation Setup
+## Post-Deployment Setup
 
-### 1. Access OpnForm
-Navigate to your domain and complete the setup wizard:
-- Create admin account
-- Configure basic settings
-- Set up email notifications
+1. **Access your OpnForm**: Navigate to your configured `APP_URL`
+2. **Create admin account**: Register the first user account
+3. **Configure email**: Set up SMTP settings for form notifications
+4. **Setup storage**: Configure file storage (S3 recommended for production)
+5. **Enable features**: Add API keys for AI features and captcha protection
 
-### 2. Configure Email (Recommended)
-For form notifications and responses:
-1. Set up an SMTP provider (Gmail, SendGrid, etc.)
-2. Configure the `MAIL_*` environment variables
-3. Test email delivery in OpnForm settings
+## Default Access
 
-### 3. Set Up File Storage (Optional)
-For file uploads in forms:
-- **Local Storage**: No additional setup needed
-- **S3 Storage**: Configure AWS credentials and bucket
+- **Port**: 3000 (configurable via `PORT` variable)
+- **Database**: PostgreSQL with persistent storage
+- **Redis**: Used for caching and background job queues
 
-### 4. Enable AI Features (Optional)
-To use AI form generation:
-1. Get an OpenAI API key
-2. Set the `OPEN_AI_API_KEY` environment variable
-3. Restart the application
+## Health Checks
 
-## Backup and Maintenance
+All services include health checks:
+- API services check Laravel application status
+- UI service checks frontend availability
+- Database checks PostgreSQL connectivity
+- Redis checks service availability
 
-### Database Backup
-The PostgreSQL database is stored in the `postgres-data` volume. Coolify automatically handles volume backups if configured.
+## Volumes
 
-### File Uploads Backup  
-User-uploaded files are stored in the `opnform_storage` volume. This should also be included in your backup strategy.
+- `postgres-data`: PostgreSQL data persistence
+- `opnform_storage`: Application file storage
+- `redis-data`: Redis data persistence
 
-### Updates
-To update OpnForm:
-1. Check for new releases on the [OpnForm GitHub](https://github.com/JhumanJ/OpnForm)
-2. Update the image tags in your Coolify deployment
-3. Restart the services
+## Resources
 
-## Troubleshooting
-
-### Application Not Loading
-1. Check service logs in Coolify dashboard
-2. Verify all required environment variables are set
-3. Ensure database connection is successful
-
-### Email Not Working
-1. Verify SMTP credentials are correct
-2. Check firewall rules for SMTP ports
-3. Test with `MAIL_MAILER=log` to debug
-
-### File Uploads Failing
-1. Check storage configuration
-2. Verify volume mounts are working
-3. Check nginx file size limits
-
-### Performance Issues
-1. Monitor Redis cache performance
-2. Check database query performance
-3. Consider scaling worker processes
+- **Official Website**: [https://opnform.com](https://opnform.com)
+- **Documentation**: [https://docs.opnform.com](https://docs.opnform.com)
+- **GitHub**: [https://github.com/JhumanJ/opnform](https://github.com/JhumanJ/opnform)
+- **Docker Documentation**: [https://docs.opnform.com/deployment/docker](https://docs.opnform.com/deployment/docker)
 
 ## Support
 
-- **Official Documentation**: [OpnForm Docs](https://github.com/JhumanJ/OpnForm)
-- **GitHub Issues**: [OpnForm Issues](https://github.com/JhumanJ/OpnForm/issues)  
-- **Coolify Support**: [Coolify Discord](https://discord.gg/coolify)
+For issues with this Coolify template, please check:
+1. OpnForm official documentation
+2. GitHub repository issues
+3. Coolify documentation for deployment issues
 
 ## License
 
-OpnForm is open-source software licensed under the [AGPL-3.0 license](https://github.com/JhumanJ/OpnForm/blob/main/LICENSE).
-
-This Coolify template is provided under the MIT license.
+OpnForm is open source software licensed under the AGPL-3.0 license.

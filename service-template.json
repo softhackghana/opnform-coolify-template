@@ -1,0 +1,192 @@
+{
+  "name": "OpnForm",
+  "description": "Beautiful open source form builder with AI-powered features. Self-hosted alternative to Typeform, Google Forms.",
+  "compose": "docker-compose.yml",
+  "tags": ["forms", "survey", "data-collection", "no-code", "ai", "self-hosted"],
+  "logo": "https://raw.githubusercontent.com/JhumanJ/opnform/main/client/public/img/logo.svg",
+  "links": [
+    {
+      "name": "Official Website",
+      "url": "https://opnform.com"
+    },
+    {
+      "name": "GitHub Repository",
+      "url": "https://github.com/JhumanJ/opnform"
+    },
+    {
+      "name": "Documentation",
+      "url": "https://docs.opnform.com"
+    }
+  ],
+  "documentation": "https://docs.opnform.com/deployment/docker",
+  "variables": [
+    {
+      "id": "APP_URL",
+      "name": "Application URL",
+      "description": "The full URL where your OpnForm will be accessible (e.g., https://forms.yourdomain.com)",
+      "defaultValue": "http://localhost",
+      "required": true
+    },
+    {
+      "id": "FRONT_URL",
+      "name": "Frontend URL",
+      "description": "The full URL for the frontend (usually same as APP_URL)",
+      "defaultValue": "http://localhost",
+      "required": true
+    },
+    {
+      "id": "APP_KEY",
+      "name": "Application Key",
+      "description": "Laravel application key (32 character random string). Generate with: php artisan key:generate --show",
+      "defaultValue": "",
+      "required": true
+    },
+    {
+      "id": "JWT_SECRET",
+      "name": "JWT Secret",
+      "description": "JWT secret key for authentication (64 character random string)",
+      "defaultValue": "",
+      "required": true
+    },
+    {
+      "id": "DB_PASSWORD",
+      "name": "Database Password",
+      "description": "Password for the PostgreSQL database",
+      "defaultValue": "",
+      "required": true
+    },
+    {
+      "id": "MAIL_FROM_ADDRESS",
+      "name": "Mail From Address",
+      "description": "Email address used for sending emails",
+      "defaultValue": "noreply@yourdomain.com",
+      "required": true
+    },
+    {
+      "id": "FRONT_API_SECRET",
+      "name": "Frontend API Secret",
+      "description": "Secret key for frontend to backend communication (64 character random string)",
+      "defaultValue": "",
+      "required": true
+    },
+    {
+      "id": "REDIS_PASSWORD",
+      "name": "Redis Password",
+      "description": "Password for Redis (leave empty for no password)",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "PORT",
+      "name": "Port",
+      "description": "Port to expose the application on",
+      "defaultValue": "3000",
+      "required": false
+    },
+    {
+      "id": "MAIL_MAILER",
+      "name": "Mail Driver",
+      "description": "Mail driver (smtp, sendmail, mailgun, ses, postmark)",
+      "defaultValue": "smtp",
+      "required": false
+    },
+    {
+      "id": "MAIL_HOST",
+      "name": "SMTP Host",
+      "description": "SMTP server hostname",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "MAIL_PORT",
+      "name": "SMTP Port",
+      "description": "SMTP server port",
+      "defaultValue": "587",
+      "required": false
+    },
+    {
+      "id": "MAIL_USERNAME",
+      "name": "SMTP Username",
+      "description": "SMTP authentication username",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "MAIL_PASSWORD",
+      "name": "SMTP Password",
+      "description": "SMTP authentication password",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "FILESYSTEM_DRIVER",
+      "name": "File Storage Driver",
+      "description": "File storage driver (local, s3)",
+      "defaultValue": "local",
+      "required": false
+    },
+    {
+      "id": "AWS_ACCESS_KEY_ID",
+      "name": "AWS Access Key ID",
+      "description": "AWS access key for S3 storage (if using S3)",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "AWS_SECRET_ACCESS_KEY",
+      "name": "AWS Secret Access Key",
+      "description": "AWS secret key for S3 storage (if using S3)",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "AWS_BUCKET",
+      "name": "AWS S3 Bucket",
+      "description": "S3 bucket name (if using S3)",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "OPEN_AI_API_KEY",
+      "name": "OpenAI API Key",
+      "description": "OpenAI API key for AI-powered features",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "H_CAPTCHA_SITE_KEY",
+      "name": "hCaptcha Site Key",
+      "description": "hCaptcha site key for form protection",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "H_CAPTCHA_SECRET_KEY",
+      "name": "hCaptcha Secret Key",
+      "description": "hCaptcha secret key for form protection",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "AMPLITUDE_CODE",
+      "name": "Amplitude Code",
+      "description": "Optional: Your Amplitude tracking code for analytics",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "CRISP_WEBSITE_ID",
+      "name": "Crisp Website ID",
+      "description": "Optional: Your Crisp chat widget website ID",
+      "defaultValue": "",
+      "required": false
+    },
+    {
+      "id": "GOOGLE_ANALYTICS_CODE",
+      "name": "Google Analytics Code",
+      "description": "Optional: Your Google Analytics tracking code",
+      "defaultValue": "",
+      "required": false
+    }
+  ]
+}
