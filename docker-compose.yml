@@ -2,11 +2,20 @@
 # https://opnform.com
 
 services:
+  api-init:
+    image: jhumanj/opnform-api:latest
+    container_name: opnform-api-init
+    command: ["/bin/sh", "-c", "cp -r /usr/share/nginx/html/* /shared-app/ && echo 'Laravel app files copied to shared volume'"]
+    volumes:
+      - opnform_app:/shared-app
+    restart: "no"
+
   api:
     image: jhumanj/opnform-api:latest
     container_name: opnform-api
     volumes:
       - opnform_storage:/usr/share/nginx/html/storage:rw
+      - opnform_app:/usr/share/nginx/html:rw
     environment: &api-environment
       # Core Application Settings
       APP_ENV: production
@@ -68,6 +77,8 @@ services:
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
     depends_on:
+      api-init:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis:
@@ -85,6 +96,7 @@ services:
     command: ["php", "artisan", "queue:work"]
     volumes:
       - opnform_storage:/usr/share/nginx/html/storage:rw
+      - opnform_app:/usr/share/nginx/html:ro
     environment: *api-environment
     depends_on:
       api:
@@ -102,6 +114,7 @@ services:
     command: ["php", "artisan", "schedule:work"]
     volumes:
       - opnform_storage:/usr/share/nginx/html/storage:rw
+      - opnform_app:/usr/share/nginx/html:ro
     environment: *api-environment
     depends_on:
       api:
@@ -170,6 +183,7 @@ services:
       NGINX_MAX_BODY_SIZE: ${NGINX_MAX_BODY_SIZE:-64m}
     volumes:
       - ./nginx.conf:/etc/nginx/templates/default.conf.template
+      - opnform_app:/usr/share/nginx/html:ro
     depends_on:
       api:
         condition: service_started
@@ -185,4 +199,5 @@ services:
 volumes:
   postgres-data:
   opnform_storage:
+  opnform_app:
   redis-data:

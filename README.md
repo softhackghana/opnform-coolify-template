@@ -19,6 +19,7 @@ OpnForm is a self-hosted alternative to Typeform and Google Forms that allows yo
 
 This template deploys OpnForm with the following services:
 
+- **API Init**: Initializes shared Laravel application files
 - **API**: Laravel-based backend API
 - **Worker**: Queue worker for background tasks
 - **Scheduler**: Laravel scheduler for cron jobs
@@ -103,14 +104,17 @@ openssl rand -hex 32
 
 All services include health checks:
 - API services check Laravel application status
-- UI service checks frontend availability
+- UI service checks frontend availability on 0.0.0.0:3000
 - Database checks PostgreSQL connectivity
 - Redis checks service availability
+
+**Note**: The UI container is configured to bind to 0.0.0.0:3000 to ensure proper accessibility from the ingress proxy and health check functionality.
 
 ## Volumes
 
 - `postgres-data`: PostgreSQL data persistence
 - `opnform_storage`: Application file storage
+- `opnform_app`: Shared Laravel application files
 - `redis-data`: Redis data persistence
 
 ## Resources
