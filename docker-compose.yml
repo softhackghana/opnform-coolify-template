@@ -125,8 +125,10 @@ services:
       NUXT_PUBLIC_AMPLITUDE_CODE: ${AMPLITUDE_CODE:-}
       NUXT_PUBLIC_CRISP_WEBSITE_ID: ${CRISP_WEBSITE_ID:-}
       NUXT_PUBLIC_GOOGLE_ANALYTICS_CODE: ${GOOGLE_ANALYTICS_CODE:-}
+      NUXT_HOST: 0.0.0.0
+      NUXT_PORT: 3000
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000/login || exit 1"]
+      test: ["CMD-SHELL", "wget --spider -q http://0.0.0.0:3000/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
