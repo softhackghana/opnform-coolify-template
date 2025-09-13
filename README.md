@@ -30,22 +30,30 @@ This template deploys OpnForm with the following services:
 
 ## Required Environment Variables
 
+⚠️ **CRITICAL**: All of these variables MUST be set for the deployment to work properly.
+
 ### Core Settings
-- `APP_URL`: Full URL where OpnForm will be accessible
+- `APP_URL`: Full URL where OpnForm will be accessible (e.g., https://forms.yourdomain.com)
 - `FRONT_URL`: Frontend URL (usually same as APP_URL)
-- `APP_KEY`: Laravel application key (32 character random string)
-- `JWT_SECRET`: JWT secret for authentication (64 character random string)
-- `FRONT_API_SECRET`: Frontend API secret for secure communication (64 character random string)
-- `DB_PASSWORD`: PostgreSQL database password
-- `MAIL_FROM_ADDRESS`: Email address for outgoing emails
+- `APP_KEY`: Laravel application key (base64 encoded) - **MUST BE SET**
+- `JWT_SECRET`: JWT secret for authentication (64 character random string) - **MUST BE SET**
+- `FRONT_API_SECRET`: Frontend API secret for secure communication (64 character random string) - **MUST BE SET**
+- `DB_PASSWORD`: PostgreSQL database password - **MUST BE SET**
+- `MAIL_FROM_ADDRESS`: Valid email address for outgoing emails - **MUST BE SET**
+
+> **Note**: Missing any of these required variables will cause the deployment to timeout as containers will fail health checks.
 
 ### Generate Required Keys
 
 To generate the required keys, you can use:
 
-**APP_KEY**: Generate a 32-character base64 random string using:
+**APP_KEY**: Generate a Laravel-compatible base64 key using:
 ```bash
-openssl rand -base64 32
+php -r "echo 'base64:'.base64_encode(random_bytes(32)).PHP_EOL;"
+```
+Or using OpenSSL:
+```bash
+echo "base64:$(openssl rand -base64 32)"
 ```
 
 **JWT_SECRET**: Generate a 64-character random string using:
@@ -85,6 +93,21 @@ openssl rand -hex 32
 - `AMPLITUDE_CODE`: Amplitude tracking code
 - `CRISP_WEBSITE_ID`: Crisp chat widget ID
 - `GOOGLE_ANALYTICS_CODE`: Google Analytics tracking code
+
+## Troubleshooting
+
+### Deployment Timeout Issues
+If your deployment times out after ~1 hour:
+
+1. **Check required environment variables**: Ensure ALL required variables are set (see above)
+2. **Verify database credentials**: `DB_PASSWORD` must match between database and API services
+3. **Check Redis configuration**: If using `REDIS_PASSWORD`, ensure it's set correctly
+4. **Review container logs**: Look for "Waiting for DB to be ready" or "No application encryption key" errors
+
+### Common Error Messages
+- **"No application encryption key"**: Set a valid `APP_KEY`
+- **"Waiting for DB to be ready" (infinite loop)**: Check database credentials
+- **503 Service Unavailable**: API container likely failed to start - check logs
 
 ## Post-Deployment Setup
 

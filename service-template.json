@@ -37,7 +37,7 @@
     {
       "id": "APP_KEY",
       "name": "Application Key",
-      "description": "Laravel application key (32 character random string). Generate with: php artisan key:generate --show",
+      "description": "Laravel application key (base64 encoded 32 character random string). Generate with: php -r \"echo 'base64:'.base64_encode(random_bytes(32));\"",
       "defaultValue": "",
       "required": true
     },
@@ -72,7 +72,7 @@
     {
       "id": "REDIS_PASSWORD",
       "name": "Redis Password",
-      "description": "Password for Redis (leave empty for no password)",
+      "description": "Password for Redis (recommended to set a strong password)",
       "defaultValue": "",
       "required": false
     },
